@@ -1,6 +1,9 @@
 import argparse
 import json
 import os
+import torch_xla
+import torch_xla.core.xla_model as xm
+
 
 import numpy as np
 import pandas as pd
@@ -467,7 +470,7 @@ def main():
     set_seed(0)
     dataset_size = args.n_samples
 
-    model, tokenizer = load_model_and_validate_gpu(args.model)
+    model, tokenizer = xm.xla_device()
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     stop_token_id = None
