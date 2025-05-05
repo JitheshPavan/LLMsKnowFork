@@ -14,6 +14,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPClassifier
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
+import torch_xla
+import torch_xla.core.xla_model as xm
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 N_LAYERS_MISTRAL = 32
 N_LAYER_LLAMA = 32
@@ -302,13 +306,19 @@ def extract_internal_reps_all_layers_and_tokens(model, input_output_ids_lst, pro
 
 
 def load_model_and_validate_gpu(model_path, tokenizer_path=None):
-    if tokenizer_path is None:
-        tokenizer_path = model_path
+
+    device = xm.xla_device()   # Grab the TPU device
+
     tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B")
+
     print("Started loading model")
-    model = AutoModelForCausalLM.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B", device_map='auto', torch_dtype=torch.bfloat16)
-    # assert ('cpu' not in model.hf_device_map.values())
-    print("model loaded")
+    model = AutoModelForCausalLM.from_pretrained(
+        "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+        torch_dtype=torch.bfloat16
+    ).to(device)
+    
+    print("Model loaded")
+
     return model, tokenizer
 
 
