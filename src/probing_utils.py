@@ -15,6 +15,9 @@ from sklearn.neural_network import MLPClassifier
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
+import torch_xla
+import torch_xla.core.xla_model as xm
+
 N_LAYERS_MISTRAL = 32
 N_LAYER_LLAMA = 32
 
