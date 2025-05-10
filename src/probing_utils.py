@@ -225,7 +225,7 @@ def get_embeddings_in_token(token, layer, extracted_embeddings, tokenizer, promp
 
 
 def extract_internal_reps_single_sample(model, model_input, probe_at, model_name):
-
+    device=  xm.xla_device()
     model_input = model_input.to(model.device)
     layers_to_trace = get_probing_layer_names(probe_at, model_name)
 
