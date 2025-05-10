@@ -96,15 +96,17 @@ def encode(prompt, tokenizer, model_name):
 
 
 def tokenize(prompt, tokenizer, model_name, tokenizer_args=None):
+    device= xm.xla_device()
+
     if 'instruct' in model_name.lower():
         messages = [
             {"role": "user", "content": prompt}
         ]
-        model_input = tokenizer.apply_chat_template(messages, return_tensors="pt", **(tokenizer_args or {})).to('cuda')
+        model_input = tokenizer.apply_chat_template(messages, return_tensors="pt", **(tokenizer_args or {})).to(device)
     else: # non instruct model
         model_input = tokenizer(prompt, return_tensors='pt', **(tokenizer_args or {}))
         if "input_ids" in model_input:
-            model_input = model_input["input_ids"].to('cuda')
+            model_input = model_input["input_ids"].to(device)
     return model_input
 
 
@@ -221,8 +223,8 @@ def get_embeddings_in_token(token, layer, extracted_embeddings, tokenizer, promp
 
 
 def extract_internal_reps_single_sample(model, model_input, probe_at, model_name):
-
-    model_input = model_input.to(model.device)
+    device = xm.xla_device()
+    model_input = model_input.to(device)
     layers_to_trace = get_probing_layer_names(probe_at, model_name)
 
     with torch.no_grad():
@@ -306,7 +308,8 @@ def load_model_and_validate_gpu(model_path, tokenizer_path=None):
         tokenizer_path = model_path
     tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B")
     print("Started loading model")
-    model = AutoModelForCausalLM.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B", device_map='auto', torch_dtype=torch.bfloat16,low_cpu_mem_usage=True)
+    model = AutoModelForCausalLM.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B", torch_dtype=torch.bfloat16,low_cpu_mem_usage=True)
+    model=model.to(device)
     assert ('cpu' not in model.hf_device_map.values())
     print("model loaded")
     return model, tokenizer
