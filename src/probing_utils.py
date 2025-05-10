@@ -304,6 +304,7 @@ def extract_internal_reps_all_layers_and_tokens(model, input_output_ids_lst, pro
 
 
 def load_model_and_validate_gpu(model_path, tokenizer_path=None):
+    device= xm.xla_device()
     if tokenizer_path is None:
         tokenizer_path = model_path
     tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B")
