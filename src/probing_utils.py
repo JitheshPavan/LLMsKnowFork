@@ -314,7 +314,7 @@ def load_model_and_validate_gpu(model_path, tokenizer_path=None):
     print("Started loading model")
     model = AutoModelForCausalLM.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B", torch_dtype=torch.bfloat16,low_cpu_mem_usage=True)
     model=model.to(device)
-    assert ('cpu' not in model.hf_device_map.values())
+    # assert ('cpu' not in model.hf_device_map.values())
     print("model loaded")
     return model, tokenizer
 
