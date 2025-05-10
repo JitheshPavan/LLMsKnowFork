@@ -15,6 +15,9 @@ from compute_correctness import compute_correctness
 from probing_utils import load_model_and_validate_gpu, tokenize, generate, LIST_OF_DATASETS, MODEL_FRIENDLY_NAMES, \
     LIST_OF_MODELS
 
+import torch_xla
+import torch_xla.core.xla_model as xm
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="A script for generating model answers and outputting to csv")
@@ -467,7 +470,7 @@ def main():
     dataset_size = args.n_samples
 
     model, tokenizer = load_model_and_validate_gpu(args.model)
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = xm.xla_device()
 
     stop_token_id = None
     if 'instruct' not in args.model.lower():
