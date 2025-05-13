@@ -302,6 +302,8 @@ def extract_internal_reps_all_layers_and_tokens(model, input_output_ids_lst, pro
 
 
 def load_model_and_validate_gpu(model_path, tokenizer_path=None):
+    model_path = "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
+    tokenizer_path="deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
     if tokenizer_path is None:
         tokenizer_path = model_path
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
